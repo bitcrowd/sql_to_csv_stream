@@ -41,6 +41,7 @@ module SqlToCsvStream
     private
 
     def default_connection
+      raise 'SqlToCsvStream::Stream needs a PostgreSQL database connection.' unless defined?(ActiveRecord)
       ActiveRecord::Base.connection.raw_connection
     end
 

@@ -1,8 +1,9 @@
 # SqlToCsvStream
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/sql_to_csv_stream`. To experiment with that code, run `bin/console` for an interactive prompt.
+This is your favorite gem to produce CSV directly from SQL queries.
+It queries a PostgreSQL with a [`COPY`](https://www.postgresql.org/docs/current/sql-copy.html) statement and streams the result as CSV directly into a ruby enumerator.
 
-TODO: Delete this and the text above, and describe your gem
+This gem can be used in all ruby applications, but ships with a special renderer for Rails to easily render CSV downloads from your rails controller.
 
 ## Installation
 
@@ -20,9 +21,67 @@ Or install it yourself as:
 
     $ gem install sql_to_csv_stream
 
+If you use rails, you may register the new csv-stream renderer in an initializer
+
+```ruby
+require 'sql_to_csv_stream'
+
+SqlToCsvStream.register_csv_from_sql_rails_renderer
+```
+
 ## Usage
 
-TODO: Write usage instructions here
+In Rails, you can use the stream renderer from a Controller:
+
+```ruby
+class UsersController < ApplicationController
+  def index
+    @users = User.all.where(deleted_at: null)
+
+    respond_to do |format|
+      format.html
+      format.csv do
+        render csv_from_sql: @users, filename: 'users.csv'
+      end
+    end
+  end
+end
+```
+
+This, unlike many other CSV rendering techniques, instantly sends results to the user by streaming the CSV while it is generated.
+This may is light on memory. By streaming the data instantly, even large CSV files (that need longer to generate than the HTTP server connection timeout value) can be produced without the connection being interrupted by a connection timeout.
+
+The `csv_from_sql` renderer automatically responds with a gzipped encoding if the client accepts it. This drastically reduces file sizes we need to send over the wire.
+
+Any SQL string the PostgreSQL [`COPY` command](https://www.postgresql.org/docs/current/sql-copy.html) accepts can be given to the renderer.
+Alternatively, any object may be given that produces such SQL on `.to_sql` or `to_s`.
+So you can use your favorite query-object pattern :)
+
+If you are not in Rails or want to process CSV in any other way from within Rails, you can use the `Stream` class.
+
+```ruby
+require 'sql_to_csv_stream'
+
+file = File.open('users.csv', 'w')
+Stream.new('SELECT * FROM users;').each do |csv_row|
+  file.write
+end
+file.close
+```
+
+Or write the compressed file with:
+
+```ruby
+require 'sql_to_csv_stream'
+
+file = File.open('users.csv.gz', 'w')
+Stream.new('SELECT * FROM users;', use_gzip: true).each do |csv_row|
+  file.write
+end
+file.close
+```
+
+For more options, see the class documentation of the `Stream` class.
 
 ## Development
 
@@ -32,7 +91,8 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/sql_to_csv_stream. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/tessi/sql_to_csv_stream. New feature ideas are welcome too -- please present your ideas in an issue first so we can together discuss whether this idea fits into the scope of this project.
+This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
@@ -40,4 +100,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the SqlToCsvStream project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/sql_to_csv_stream/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the SqlToCsvStream project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/tessi/sql_to_csv_stream/blob/master/CODE_OF_CONDUCT.md).

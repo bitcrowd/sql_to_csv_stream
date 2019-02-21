@@ -8,7 +8,7 @@ module SqlToCsvStream
       encoding: 'utf8'
     }.freeze
 
-    def initialize(sql, connection: default_connection, copy_options: {}, use_gzip: true)
+    def initialize(sql, connection: default_connection, copy_options: {}, use_gzip: false)
       @sql = (sql.respond_to?(:to_sql) ? sql.to_sql : sql.to_s).chomp(';')
       @connection = connection
       @copy_options = COPY_OPTIONS_DEFAULTS.merge(copy_options)

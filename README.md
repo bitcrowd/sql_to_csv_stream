@@ -5,6 +5,8 @@ It queries a PostgreSQL with a [`COPY`](https://www.postgresql.org/docs/current/
 
 This gem can be used in all ruby applications, but ships with a special renderer for Rails to easily render CSV downloads from your rails controller.
 
+Note: This is project is still in a proof-of-concept phase. We may rename some things, make the code more readable and very likely add some tests :)
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -101,3 +103,7 @@ The gem is available as open source under the terms of the [MIT License](https:/
 ## Code of Conduct
 
 Everyone interacting in the SqlToCsvStream project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/tessi/sql_to_csv_stream/blob/master/CODE_OF_CONDUCT.md).
+
+## Previous work
+
+We didn't invent streaming, nor did we were the first to have the idea to integrate this in ruby and/or rails. Some previous approaches are described [here](https://shift.infinite.red/fast-csv-report-generation-with-postgres-in-rails-d444d9b915ab), [here](https://www.smartly.io/blog/streaming-data-with-ruby-enumerators), [here](https://medium.com/table-xi/stream-csv-files-in-rails-because-you-can-46c212159ab7), or [here](https://gist.github.com/stereoscott/6996507). We are thankful for the previous work done which led us into the right direction and enabled us to (hopefully) improve upon it.

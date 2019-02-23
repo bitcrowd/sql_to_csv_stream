@@ -15,9 +15,12 @@ module SqlToCsvStream
       @use_gzip = use_gzip
     end
 
-    def each(&response_yielder)
+    def each(&stream)
+      # GzipWriter needs to get passed an object that implements the #write method.
+      # this is why we implement the #write method further down
+      # while assigning the stream we need to write to in an instance variable to be used there.
       @gzip_writer = Zlib::GzipWriter.new(self) if use_gzip?
-      @response_yielder = response_yielder
+      @stream = stream
 
       @connection.copy_data "COPY (#{@sql}) TO STDOUT WITH (#{joined_copy_options})" do
         while row = @connection.get_copy_data
@@ -33,15 +36,15 @@ module SqlToCsvStream
     end
 
     def write(string)
-      return unless @response_yielder
-
-      @response_yielder.yield(string)
+      return unless @stream
+      @stream << string
     end
 
     private
 
     def default_connection
       raise 'SqlToCsvStream::Stream needs a PostgreSQL database connection.' unless defined?(ActiveRecord)
+
       ActiveRecord::Base.connection.raw_connection
     end
 

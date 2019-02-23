@@ -37,7 +37,7 @@ module SqlToCsvStream
 
     def write(string)
       return unless @stream
-      @stream << string
+      @stream.yield(string)
     end
 
     private

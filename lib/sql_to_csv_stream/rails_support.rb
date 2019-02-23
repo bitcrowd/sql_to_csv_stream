@@ -35,7 +35,7 @@ module SqlToCsvStream
     end
 
     def self.prepare_streaming(type, request, response, response_headers, options)
-      filename = options.fetch(:filename, 'data.csv')
+      filename = options.fetch(:filename, 'data')
       copy_options = options.fetch(:copy_options, {})
       headers_option = options.fetch(:headers, {})
       merged_headers = default_headers(filename, type).merge(headers_option)

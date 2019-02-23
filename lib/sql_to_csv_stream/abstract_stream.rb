@@ -8,7 +8,7 @@ module SqlToCsvStream
     end
 
     def each(&stream)
-      # GzipWriter needs to get passed an object that implements the #write method.
+      # Zlib::GzipWriter needs to get passed an object that implements the #write method.
       # this is why we implement the #write method further down
       # while assigning the stream we need to write to in an instance variable to be used there.
       @gzip_writer = Zlib::GzipWriter.new(self) if use_gzip?

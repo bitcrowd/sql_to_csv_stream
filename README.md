@@ -28,7 +28,7 @@ If you use rails, you may register the new stream renderers in an initializer.
 ```ruby
 require 'sql_to_csv_stream'
 
-SqlToCsvStream.register_csv_from_sql_rails_renderer
+SqlToCsvStream.register_renderer
 ```
 
 ## Usage
@@ -43,10 +43,10 @@ class UsersController < ApplicationController
     respond_to do |format|
       format.html
       format.csv do
-        render csv_from_sql: @users, filename: 'users.csv'
+        render csv_stream: @users, filename: 'users.csv'
       end
       format.json do
-        render json_from_sql: @users, filename: 'users.json'
+        render json_stream: @users, filename: 'users.json'
       end
     end
   end
@@ -65,8 +65,6 @@ So you can use your favorite query-object pattern :)
 If you are not in Rails or want to process CSV/JSON in any other way from within Rails, you can use the `Stream` classes.
 
 ```ruby
-require 'sql_to_csv_stream'
-
 file = File.open('users.csv', 'w')
 SqlToCsvStream::CsvStream.new('SELECT * FROM users;').each do |csv_row|
   file.write
@@ -77,8 +75,6 @@ file.close
 Or write the compressed file with:
 
 ```ruby
-require 'sql_to_csv_stream'
-
 file = File.open('users.csv.gz', 'w')
 SqlToCsvStream::CsvStream.new('SELECT * FROM users;', use_gzip: true).each do |csv_row|
   file.write
@@ -86,11 +82,9 @@ end
 file.close
 ```
 
-Writing JSON file works similarly:
+Writing a JSON file works similarly:
 
 ```ruby
-require 'sql_to_csv_stream'
-
 file = File.open('users.json', 'w')
 SqlToCsvStream::JsonStream.new('SELECT * FROM users;').each do |csv_row|
   file.write

@@ -1,7 +1,7 @@
 module SqlToCsvStream
   module RailsSupport
     def self.register_renderer
-      ActionController::Renderers.add :csv_from_sql do |sql, options|
+      ActionController::Renderers.add :csv_stream do |sql, options|
         stream_options = SqlToCsvStream::RailsSupport.prepare_streaming(
           'text/csv',
           request,
@@ -12,7 +12,7 @@ module SqlToCsvStream
         self.response_body = CsvStream.new(sql, **stream_options)
       end
 
-      ActionController::Renderers.add :json_from_sql do |sql, options|
+      ActionController::Renderers.add :json_stream do |sql, options|
         stream_options = SqlToCsvStream::RailsSupport.prepare_streaming(
           'application/json',
           request,

@@ -1,9 +1,9 @@
 # SqlToCsvStream
 
-This is your favorite gem to produce CSV directly from SQL queries.
-It queries a PostgreSQL with a [`COPY`](https://www.postgresql.org/docs/current/sql-copy.html) statement and streams the result as CSV directly into a ruby enumerator.
+This is your favorite gem to produce CSV or JSON directly from SQL queries.
+It queries a PostgreSQL with a [`COPY`](https://www.postgresql.org/docs/current/sql-copy.html) statement and streams the result as CSV/JSON directly into a ruby enumerator.
 
-This gem can be used in all ruby applications, but ships with a special renderer for Rails to easily render CSV downloads from your rails controller.
+This gem can be used in all ruby applications, but ships with a special renderer for Rails to easily render downloads from your rails controller.
 
 Note: This is project is still in a proof-of-concept phase. We may rename some things, make the code more readable and very likely add some tests :)
 
@@ -23,7 +23,7 @@ Or install it yourself as:
 
     $ gem install sql_to_csv_stream
 
-If you use rails, you may register the new csv-stream renderer in an initializer
+If you use rails, you may register the new stream renderers in an initializer.
 
 ```ruby
 require 'sql_to_csv_stream'
@@ -45,27 +45,30 @@ class UsersController < ApplicationController
       format.csv do
         render csv_from_sql: @users, filename: 'users.csv'
       end
+      format.json do
+        render json_from_sql: @users, filename: 'users.json'
+      end
     end
   end
 end
 ```
 
-This, unlike many other CSV rendering techniques, instantly sends results to the user by streaming the CSV while it is generated.
-This may is light on memory. By streaming the data instantly, even large CSV files (that need longer to generate than the HTTP server connection timeout value) can be produced without the connection being interrupted by a connection timeout.
+This, unlike many other CSV/JSON rendering techniques, instantly sends results to the user by streaming the content while it is being generated.
+This is light on memory. By streaming the data instantly, even large files (that need longer to generate than the HTTP server connection timeout value) can be produced without the connection being interrupted by a connection timeout.
 
-The `csv_from_sql` renderer automatically responds with a gzipped encoding if the client accepts it. This drastically reduces file sizes we need to send over the wire.
+The streaming renderer automatically responds with a gzipped encoding if the client accepts it. This drastically reduces file sizes we need to send over the wire.
 
 Any SQL string the PostgreSQL [`COPY` command](https://www.postgresql.org/docs/current/sql-copy.html) accepts can be given to the renderer.
 Alternatively, any object may be given that produces such SQL on `.to_sql` or `to_s`.
 So you can use your favorite query-object pattern :)
 
-If you are not in Rails or want to process CSV in any other way from within Rails, you can use the `Stream` class.
+If you are not in Rails or want to process CSV/JSON in any other way from within Rails, you can use the `Stream` classes.
 
 ```ruby
 require 'sql_to_csv_stream'
 
 file = File.open('users.csv', 'w')
-Stream.new('SELECT * FROM users;').each do |csv_row|
+SqlToCsvStream::CsvStream.new('SELECT * FROM users;').each do |csv_row|
   file.write
 end
 file.close
@@ -77,13 +80,25 @@ Or write the compressed file with:
 require 'sql_to_csv_stream'
 
 file = File.open('users.csv.gz', 'w')
-Stream.new('SELECT * FROM users;', use_gzip: true).each do |csv_row|
+SqlToCsvStream::CsvStream.new('SELECT * FROM users;', use_gzip: true).each do |csv_row|
   file.write
 end
 file.close
 ```
 
-For more options, see the class documentation of the `Stream` class.
+Writing JSON file works similarly:
+
+```ruby
+require 'sql_to_csv_stream'
+
+file = File.open('users.json', 'w')
+SqlToCsvStream::JsonStream.new('SELECT * FROM users;').each do |csv_row|
+  file.write
+end
+file.close
+```
+
+For more options, see the class documentation of the `CsvStream` or `JsonStream` class.
 
 ## Development
 

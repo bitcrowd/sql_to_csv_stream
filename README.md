@@ -28,7 +28,7 @@ If you use rails, you may register the new stream renderers in an initializer.
 ```ruby
 require 'sql_to_csv_stream'
 
-SqlToCsvStream.register_renderer
+SqlToCsvStream.register_rails_renderer
 ```
 
 ## Usage

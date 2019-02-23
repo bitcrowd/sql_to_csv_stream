@@ -19,12 +19,11 @@ module SqlToCsvStream
           use_gzip = false
         end
 
-        self.response_body = Stream.new(sql, copy_options: copy_options, use_gzip: use_gzip)
+        self.response_body = CsvStream.new(sql, copy_options: copy_options, use_gzip: use_gzip)
       end
 
       ActionController::Renderers.add :json_from_sql do |sql, options|
         filename = options.fetch(:filename, 'data.csv')
-        copy_options = options.fetch(:copy_options, {})
         headers_option = options.fetch(:headers, {})
 
         merged_headers = SqlToCsvStream::RailsSupport.default_headers(filename)
@@ -40,7 +39,7 @@ module SqlToCsvStream
           use_gzip = false
         end
 
-        self.response_body = JsonStream.new(sql, copy_options: copy_options, use_gzip: use_gzip)
+        self.response_body = JsonStream.new(sql, use_gzip: use_gzip)
       end
     end
 

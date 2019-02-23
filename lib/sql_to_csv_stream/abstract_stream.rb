@@ -1,17 +1,9 @@
 module SqlToCsvStream
-  class Stream
-    COPY_OPTIONS_DEFAULTS = {
-      format: 'CSV',
-      header: true,
-      # force_quote: '*',
-      # escape: "E'\\\\'",
-      encoding: 'utf8'
-    }.freeze
-
-    def initialize(sql, connection: default_connection, copy_options: {}, use_gzip: false)
-      @sql = (sql.respond_to?(:to_sql) ? sql.to_sql : sql.to_s).chomp(';')
+  class AbstractStream
+    def initialize(object, connection: default_connection, use_gzip: false)
+      @sql = (object.respond_to?(:to_sql) ? object.to_sql : object.to_s).chomp(';')
       @connection = connection
-      @copy_options = COPY_OPTIONS_DEFAULTS.merge(copy_options)
+      @copy_options = self.class::COPY_OPTIONS_DEFAULTS
       @use_gzip = use_gzip
     end
 
@@ -22,15 +14,7 @@ module SqlToCsvStream
       @gzip_writer = Zlib::GzipWriter.new(self) if use_gzip?
       @stream = stream
 
-      @connection.copy_data "COPY (#{@sql}) TO STDOUT WITH (#{joined_copy_options})" do
-        while row = @connection.get_copy_data
-          if use_gzip?
-            @gzip_writer.write(row)
-          else
-            write row
-          end
-        end
-      end
+      execute_query_and_stream_data
     ensure
       @gzip_writer.close if use_gzip?
     end
@@ -41,6 +25,18 @@ module SqlToCsvStream
     end
 
     private
+
+    def execute_query_and_stream_data
+      raise 'should be implemented in a subclass'
+    end
+
+    def zipped_write(string)
+      if use_gzip?
+        @gzip_writer.write(string)
+      else
+        write(string)
+      end
+    end
 
     def default_connection
       raise 'SqlToCsvStream::Stream needs a PostgreSQL database connection.' unless defined?(ActiveRecord)

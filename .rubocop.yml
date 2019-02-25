@@ -1,0 +1,16 @@
+inherit_gem:
+  rubocop-bitcrowd: .rubocop.yml
+
+# Note: skip this if you want to override the default AllCops:Include and AllCops:Exclude list
+inherit_mode:
+  merge:
+    - Include
+    - Exclude
+
+AllCops:
+  Exclude:
+    - 'spec/integration/dummy_app/bin/*'
+    - 'sql_to_csv_stream.gemspec'
+
+Metrics/MethodLength:
+  Max: 15

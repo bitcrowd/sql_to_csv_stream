@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'support/rails_helper'
 
 RSpec.describe 'CSV Stream', type: :feature do
@@ -27,8 +29,16 @@ RSpec.describe 'CSV Stream', type: :feature do
   end
 
   context 'with users in the database' do
-    let(:user1) { User.new(name: 'bit',   settings: {newsletter: true}, accepted_terms: true) }
-    let(:user2) { User.new(name: 'crowd', settings: {newsletter: false, nested: { values: "are possible"}}, accepted_terms: false) }
+    let(:user1) do
+      User.new name: 'bit',
+               settings: { newsletter: true },
+               accepted_terms: true
+    end
+    let(:user2) do
+      User.new name: 'crowd',
+               settings: { newsletter: false, nested: { values: 'are possible' } },
+               accepted_terms: false
+    end
     let(:users) { [user1, user2] }
     let(:serialized_users) do
       [

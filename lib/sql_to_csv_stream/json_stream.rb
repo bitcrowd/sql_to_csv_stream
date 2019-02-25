@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sql_to_csv_stream/abstract_stream'
 
 module SqlToCsvStream
@@ -12,17 +14,17 @@ module SqlToCsvStream
     def execute_query_and_stream_data
       first_line = true
       @connection.copy_data copy_sql do
-        while line = @connection.get_copy_data
-          if first_line
-            line = '[' + line.chomp
-          else
-            line = ',' + line.chomp
-          end
+        while (line = @connection.get_copy_data)
+          line = if first_line
+                   '[' + line.chomp
+                 else
+                   ',' + line.chomp
+                 end
           zipped_write(line)
           first_line = false
         end
       end
-      zipped_write("[") if first_line
+      zipped_write('[') if first_line
       zipped_write("]\n")
     end
 

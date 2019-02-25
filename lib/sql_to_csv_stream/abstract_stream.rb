@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SqlToCsvStream
   class AbstractStream
     def initialize(object, connection: default_connection, use_gzip: false)

@@ -3,7 +3,8 @@ RSpec.describe SqlToCsvStream do
     expect(SqlToCsvStream::VERSION).not_to be nil
   end
 
-  it 'does something useful' do
-    expect(false).to eq(true)
+  it 'forwards register_rails_renderer to the RailsSupport module' do
+    expect(SqlToCsvStream::RailsSupport).to receive(:register_renderer)
+    SqlToCsvStream.register_rails_renderer
   end
 end

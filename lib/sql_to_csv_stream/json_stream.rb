@@ -22,6 +22,7 @@ module SqlToCsvStream
           first_line = false
         end
       end
+      zipped_write("[") if first_line
       zipped_write("]\n")
     end
 

@@ -9,3 +9,8 @@
 
 # rspec failure tracking
 .rspec_status
+
+# dummy app we only use for testing against rails
+/spec/integration/dummy_app/db
+/spec/integration/dummy_app/tmp
+/spec/integration/dummy_app/log

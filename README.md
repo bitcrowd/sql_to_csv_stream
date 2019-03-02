@@ -41,7 +41,6 @@ class UsersController < ApplicationController
     @users = User.all.where(deleted_at: null)
 
     respond_to do |format|
-      format.html
       format.csv do
         render csv_stream: @users, filename: 'users.csv'
       end

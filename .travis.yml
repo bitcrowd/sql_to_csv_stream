@@ -25,4 +25,4 @@ before_script:
 
 script:
   - bundle exec rubocop
-  - bundle exec rspec
+  - bundle exec rspec --format progress

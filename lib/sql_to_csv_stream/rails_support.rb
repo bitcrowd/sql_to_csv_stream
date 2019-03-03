@@ -7,23 +7,23 @@ module SqlToCsvStream
       register_json_renderer
     end
 
+    # `stream` can be anything that responds to `.each`.
+    # We make use of this by providing our own stream that fetches data from Postgresql
+    # stream = (1..10).lazy.map do |i|
+    #   sleep(1);
+    #   "#{i}\n";
+    # end
+    # stream = Enumerator.new do |strean|
+    #   csv_service.call do |csv_line|
+    #     strean << csv_line
+    #   end
+    # end
     def self.register_csv_renderer
-      # `stream` can be anything that responds to `.each`.
-      # We make use of this by providing our own stream that fetches data from Postgresql
-      # stream = (1..10).lazy.map do |i|
-      #   sleep(1);
-      #   "#{i}\n";
-      # end
-      # stream = Enumerator.new do |strean|
-      #   csv_service.call do |csv_line|
-      #     strean << csv_line
-      #   end
-      # end
       ActionController::Renderers.add :csv_stream do |sql, options|
         copy_options = options.delete(:copy_options) || {}
         stream = CsvStream.new(sql, copy_options: copy_options)
-        stream = SqlToCsvStream::GzipWrapper.new(stream) if SqlToCsvStream::RailsSupport.use_gzip?(request)
-        SqlToCsvStream::RailsSupport.set_streaming_headers(headers, request)
+        stream = SqlToCsvStream::GzipWrapper.new(stream) if RailsSupport.use_gzip?(request)
+        RailsSupport.set_streaming_headers(headers, request)
         send_data stream, **options
       end
     end
@@ -31,8 +31,8 @@ module SqlToCsvStream
     def self.register_json_renderer
       ActionController::Renderers.add :json_stream do |sql, options|
         stream = JsonStream.new(sql)
-        stream = SqlToCsvStream::GzipWrapper.new(stream) if SqlToCsvStream::RailsSupport.use_gzip?(request)
-        SqlToCsvStream::RailsSupport.set_streaming_headers(headers, request)
+        stream = SqlToCsvStream::GzipWrapper.new(stream) if RailsSupport.use_gzip?(request)
+        RailsSupport.set_streaming_headers(headers, request)
         send_data stream, **options
       end
     end

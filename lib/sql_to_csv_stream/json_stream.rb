@@ -1,17 +1,19 @@
 # frozen_string_literal: true
 
-require 'sql_to_csv_stream/abstract_stream'
-
 module SqlToCsvStream
-  class JsonStream < AbstractStream
+  class JsonStream
     COPY_OPTIONS_DEFAULTS = {
       format: 'TEXT',
       encoding: 'utf8'
     }.freeze
 
-    private
+    def initialize(object, connection: default_connection)
+      @sql = (object.respond_to?(:to_sql) ? object.to_sql : object.to_s).chomp(';')
+      @connection = connection
+      @copy_options = COPY_OPTIONS_DEFAULTS
+    end
 
-    def execute_query_and_stream_data
+    def each(&stream)
       first_line = true
       @connection.copy_data copy_sql do
         while (line = @connection.get_copy_data)
@@ -20,13 +22,15 @@ module SqlToCsvStream
                  else
                    ',' + line.chomp
                  end
-          zipped_write(line)
+          stream.yield(line)
           first_line = false
         end
       end
-      zipped_write('[') if first_line
-      zipped_write("]\n")
+      stream.yield('[') if first_line
+      stream.yield("]\n")
     end
+
+    private
 
     # The source/author of this magic is:
     # https://dba.stackexchange.com/questions/90482/export-postgres-table-as-json?newreg=0b667caa47c34084bee6c90feec5e4be
@@ -41,6 +45,17 @@ module SqlToCsvStream
         SELECT REGEXP_REPLACE(ROW_TO_JSON(t)::TEXT, '\\\\', '\\', 'g')
         FROM (#{@sql}) AS t
       ) TO STDOUT WITH (#{joined_copy_options});"
+    end
+
+    def joined_copy_options
+      @copy_options.map { |k, v| "#{k.upcase} #{v}" }
+                   .join(', ')
+    end
+
+    def default_connection
+      raise 'SqlToCsvStream::Stream needs a PostgreSQL database connection.' unless defined?(ActiveRecord)
+
+      ActiveRecord::Base.connection.raw_connection
     end
   end
 end

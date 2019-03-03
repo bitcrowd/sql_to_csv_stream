@@ -21,11 +21,8 @@ module SqlToCsvStream
       # end
       ActionController::Renderers.add :csv_stream do |sql, options|
         copy_options = options.delete(:copy_options) || {}
-        stream = CsvStream.new(
-          sql,
-          use_gzip: SqlToCsvStream::RailsSupport.use_gzip?(request),
-          copy_options: copy_options
-        )
+        stream = CsvStream.new(sql, copy_options: copy_options)
+        stream = SqlToCsvStream::GzipWrapper.new(stream) if SqlToCsvStream::RailsSupport.use_gzip?(request)
         SqlToCsvStream::RailsSupport.set_streaming_headers(headers, request)
         send_data stream, **options
       end
@@ -33,10 +30,8 @@ module SqlToCsvStream
 
     def self.register_json_renderer
       ActionController::Renderers.add :json_stream do |sql, options|
-        stream = JsonStream.new(
-          sql,
-          use_gzip: SqlToCsvStream::RailsSupport.use_gzip?(request)
-        )
+        stream = JsonStream.new(sql)
+        stream = SqlToCsvStream::GzipWrapper.new(stream) if SqlToCsvStream::RailsSupport.use_gzip?(request)
         SqlToCsvStream::RailsSupport.set_streaming_headers(headers, request)
         send_data stream, **options
       end
@@ -46,6 +41,7 @@ module SqlToCsvStream
       headers['X-Accel-Buffering'] = 'no'
       headers['Cache-Control'] = 'no-cache'
       headers['Content-Encoding'] = 'gzip' if use_gzip?(request)
+      headers.delete('Content-Length')
     end
 
     def self.use_gzip?(request)

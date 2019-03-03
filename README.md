@@ -61,11 +61,11 @@ Any SQL string the PostgreSQL [`COPY` command](https://www.postgresql.org/docs/c
 Alternatively, any object may be given that produces such SQL on `.to_sql` or `to_s`.
 So you can use your favorite query-object pattern :)
 
-If you are not in Rails or want to process CSV/JSON in any other way from within Rails, you can use the `Stream` classes.
+If you are not in Rails or want to process CSV/JSON in any other way from within Rails, you can use the `*Enumerator` classes.
 
 ```ruby
 file = File.open('users.csv', 'w')
-SqlToCsvStream::CsvStream.new('SELECT * FROM users;').each do |csv_row|
+SqlToCsvStream::CsvEnumerator.new('SELECT * FROM users;').each do |csv_row|
   file.write
 end
 file.close
@@ -74,8 +74,11 @@ file.close
 Or write the compressed file with:
 
 ```ruby
+csv_enum = SqlToCsvStream::CsvEnumerator.new('SELECT * FROM users;')
+zip_enum = SqlToCsvStream::GzipWrapper.new(csv_enum)
+
 file = File.open('users.csv.gz', 'w')
-SqlToCsvStream::CsvStream.new('SELECT * FROM users;', use_gzip: true).each do |csv_row|
+zip_enum.each do |csv_row|
   file.write
 end
 file.close
@@ -85,13 +88,13 @@ Writing a JSON file works similarly:
 
 ```ruby
 file = File.open('users.json', 'w')
-SqlToCsvStream::JsonStream.new('SELECT * FROM users;').each do |csv_row|
+SqlToCsvStream::JsonEnumerator.new('SELECT * FROM users;').each do |csv_row|
   file.write
 end
 file.close
 ```
 
-For more options, see the class documentation of the `CsvStream` or `JsonStream` class.
+For more options, see the class documentation of the `CsvEnumerator` or `JsonEnumerator` class.
 
 ## Development
 

@@ -6,6 +6,12 @@ module SqlToCsvStream
       encoding: 'utf8'
     }.freeze
 
+    def self.default_connection
+      raise 'PostgreSQL database connection required' unless defined?(ActiveRecord)
+
+      ActiveRecord::Base.connection.raw_connection
+    end
+
     def initialize(sql, connection: self.class.default_connection, copy_options: {})
       @sql = sql.chomp(';')
       @connection = connection
@@ -29,12 +35,6 @@ module SqlToCsvStream
     def joined_copy_options
       @copy_options.map { |k, v| "#{k.upcase} #{v}" }
                    .join(', ')
-    end
-
-    def self.default_connection
-      raise 'PostgreSQL database connection required' unless defined?(ActiveRecord)
-
-      ActiveRecord::Base.connection.raw_connection
     end
   end
 end

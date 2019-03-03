@@ -21,7 +21,7 @@ module SqlToCsvStream
     def self.register_csv_renderer
       ActionController::Renderers.add :csv_stream do |sql, options|
         copy_options = options.delete(:copy_options) || {}
-        stream = CsvStream.new(sql, copy_options: copy_options)
+        stream = CsvEnumerator.new(sql, copy_options: copy_options)
         stream = SqlToCsvStream::GzipWrapper.new(stream) if RailsSupport.use_gzip?(request)
         RailsSupport.set_streaming_headers(headers, request)
         send_data stream, **options
@@ -30,7 +30,7 @@ module SqlToCsvStream
 
     def self.register_json_renderer
       ActionController::Renderers.add :json_stream do |sql, options|
-        stream = JsonStream.new(sql)
+        stream = JsonEnumerator.new(sql)
         stream = SqlToCsvStream::GzipWrapper.new(stream) if RailsSupport.use_gzip?(request)
         RailsSupport.set_streaming_headers(headers, request)
         send_data stream, **options

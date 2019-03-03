@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module SqlToCsvStream
-  class CsvStream
+  class CsvEnumerator
     # Other possible options are
     #   force_quote: '*'
     #   escape: "E'\\\\'"

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module SqlToCsvStream
-  class JsonStream
+  class JsonEnumerator
     JSON_COPY_OPTIONS = { format: 'TEXT' }.freeze
 
     def initialize(object, connection: PostgresqlCopyEnumerator.default_connection)

@@ -39,12 +39,43 @@ RSpec.describe SqlToCsvStream::CsvEnumerator do
     end
 
     context 'with postgresql returning data' do
-      let(:postgresql_chunks) { ['first', 'second', nil] }
+      let(:postgresql_chunks) { ["fi,rs,t\n", "se,co,nd\n", nil] }
 
       it 'yields the data as given from the database connection' do
         results = []
         enumerator.each { |chunk| results << chunk }
-        expect(results).to match_array(%w[first second])
+        expect(results).to match_array(["fi,rs,t\n", "se,co,nd\n"])
+      end
+
+      context 'when a cell contains an excel-injection attack' do
+        let(:postgresql_chunks) { ["=2+5|'/C calc'!A0\n", nil] }
+
+        it 'escapes the special symbol' do
+          results = []
+          enumerator.each { |chunk| results << chunk }
+          expect(results).to contain_exactly("'=2+5|'/C calc'!A0\n")
+        end
+
+        context 'when manually setting sanitize to false' do
+          let(:enumerator) { described_class.new(sql, connection: stub_connection, sanitize: false) }
+
+          it 'does not escape the special symbol' do
+            results = []
+            enumerator.each { |chunk| results << chunk }
+            expect(results).to contain_exactly("=2+5|'/C calc'!A0\n")
+          end
+        end
+      end
+
+      context 'when setting force_quotes' do
+        let(:enumerator) { described_class.new(sql, connection: stub_connection, force_quotes: true) }
+        let(:postgresql_chunks) { ["=2+5|'/C calc'!A0\n", nil] }
+
+        it 'yields the data as given from the database connection' do
+          results = []
+          enumerator.each { |chunk| results << chunk }
+          expect(results).to match_array(["\"'=2+5|'/C calc'!A0\"\n"])
+        end
       end
     end
   end

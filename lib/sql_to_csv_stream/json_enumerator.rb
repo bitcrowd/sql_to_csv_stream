@@ -19,17 +19,17 @@ module SqlToCsvStream
     end
 
     def each(&stream)
-      first_line = true
+      stream.yield('[')
+
+      # do not prepend a comma on the very first item
+      # to not break json syntax
+      prepend_comma = false
       @copy_enum.each do |line|
-        line = if first_line
-                 '[' + line.chomp
-               else
-                 ',' + line.chomp
-               end
-        stream.yield(line)
-        first_line = false
+        line = ',' + line if prepend_comma
+        prepend_comma = true
+        stream.yield(line.chomp)
       end
-      stream.yield('[') if first_line
+
       stream.yield("]\n")
     end
   end

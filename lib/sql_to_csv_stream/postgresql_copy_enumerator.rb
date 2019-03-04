@@ -18,10 +18,10 @@ module SqlToCsvStream
       @copy_options = COPY_OPTIONS_DEFAULTS.merge(copy_options)
     end
 
-    def each(&block)
+    def each
       @connection.copy_data(copy_sql) do
         while (row = @connection.get_copy_data)
-          block.yield(row)
+          yield(row) if block_given?
         end
       end
     end

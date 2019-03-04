@@ -19,29 +19,33 @@ module SqlToCsvStream
     #   end
     # end
     def self.register_csv_renderer
-      ActionController::Renderers.add :csv_stream do |sql, options|
-        copy_options = options.delete(:copy_options) || {}
-        stream = CsvEnumerator.new(sql, copy_options: copy_options)
-        stream = SqlToCsvStream::GzipWrapper.new(stream) if RailsSupport.use_gzip?(request)
-        RailsSupport.set_streaming_headers(headers, request)
-        send_data stream, **options
+      ActionController::Renderers.add :csv_stream do |sql, copy_options: {}, **options|
+        sanitize = options.delete(:sanitize) || true
+        force_quotes = options.delete(:force_quotes) || false
+        filename = options.delete(:filename) || 'data.csv'
+        stream = CsvEnumerator.new(sql, copy_options: copy_options, sanitize: sanitize, force_quotes: force_quotes)
+        stream = GzipWrapper.new(stream) if RailsSupport.use_gzip?(request)
+        RailsSupport.set_streaming_headers(headers, request, response, filename)
+        stream
       end
     end
 
     def self.register_json_renderer
-      ActionController::Renderers.add :json_stream do |sql, options|
+      ActionController::Renderers.add :json_stream do |sql, filename: 'data.csv'|
         stream = JsonEnumerator.new(sql)
-        stream = SqlToCsvStream::GzipWrapper.new(stream) if RailsSupport.use_gzip?(request)
-        RailsSupport.set_streaming_headers(headers, request)
-        send_data stream, **options
+        stream = GzipWrapper.new(stream) if RailsSupport.use_gzip?(request)
+        RailsSupport.set_streaming_headers(headers, request, response, filename)
+        stream
       end
     end
 
-    def self.set_streaming_headers(headers, request)
+    def self.set_streaming_headers(headers, request, response, filename)
       headers['X-Accel-Buffering'] = 'no'
       headers['Cache-Control'] = 'no-cache'
       headers['Content-Encoding'] = 'gzip' if use_gzip?(request)
+      headers['Content-Disposition'] = "attachment; filename=\"#{filename}\""
       headers.delete('Content-Length')
+      response.status = 200
     end
 
     def self.use_gzip?(request)

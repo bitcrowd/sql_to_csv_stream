@@ -32,9 +32,9 @@ module SqlToCsvStream
       @copy_enum = PostgresqlCopyEnumerator.new(sql, connection: connection, copy_options: copy_options)
     end
 
-    def each(&block)
+    def each
       @copy_enum.each do |line|
-        block.yield sanitize(line)
+        yield(sanitize(line)) if block_given?
       end
     end
 

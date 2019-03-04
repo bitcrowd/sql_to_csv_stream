@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'zlib'
+
 module SqlToCsvStream
   class GzipWrapper
     def initialize(source)
@@ -19,6 +21,7 @@ module SqlToCsvStream
       @zipper.close
     end
 
+    # called indirectly by Zlib::GzipWriter
     def write(zipped_string)
       @destination.yield(zipped_string)
     end

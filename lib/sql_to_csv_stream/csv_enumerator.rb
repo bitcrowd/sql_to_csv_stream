@@ -12,7 +12,7 @@ module SqlToCsvStream
     }.freeze
 
     def initialize(object, connection: PostgresqlCopyEnumerator.default_connection, copy_options: {})
-      sql = object.respond_to?(:to_sql) ? object.to_sql : object.to_s
+      sql = (object.respond_to?(:to_sql) ? object.to_sql : object.to_s).chomp(';')
       copy_options = COPY_OPTIONS_DEFAULTS.merge(copy_options)
       @copy_enum = PostgresqlCopyEnumerator.new(sql, connection: connection, copy_options: copy_options)
     end

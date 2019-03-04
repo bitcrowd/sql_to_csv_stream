@@ -5,7 +5,7 @@ module SqlToCsvStream
     JSON_COPY_OPTIONS = { format: 'TEXT' }.freeze
 
     def initialize(object, connection: PostgresqlCopyEnumerator.default_connection)
-      sql = object.respond_to?(:to_sql) ? object.to_sql : object.to_s
+      sql = (object.respond_to?(:to_sql) ? object.to_sql : object.to_s).chomp(';')
       # The inspiration of this magic was:
       # https://dba.stackexchange.com/questions/90482/export-postgres-table-as-json?newreg=0b667caa47c34084bee6c90feec5e4be
       #

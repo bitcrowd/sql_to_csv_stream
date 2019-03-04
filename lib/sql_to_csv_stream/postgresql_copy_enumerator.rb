@@ -19,7 +19,7 @@ module SqlToCsvStream
     end
 
     def each(&block)
-      @connection.copy_data copy_sql do
+      @connection.copy_data(copy_sql) do
         while (row = @connection.get_copy_data)
           block.yield(row)
         end

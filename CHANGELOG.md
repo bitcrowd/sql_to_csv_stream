@@ -18,4 +18,4 @@
 
 * upgrade nokogiri (addressed CVE-2019-5477)
 * upgrade all dependent gems
-* moved to CircleCI
+* move to CircleCI

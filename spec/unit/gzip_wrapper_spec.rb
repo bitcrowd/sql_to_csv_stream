@@ -4,7 +4,7 @@ RSpec.describe SqlToCsvStream::GzipWrapper do
   subject(:unzipped_output) { Zlib.gunzip(concatenated_output) }
 
   let(:concatenated_output) do
-    String.new.tap do |output| # rubocop:disable Style/EmptyLiteral
+    String.new.tap do |output|
       gzip_wrapper.each { |s| output << s }
     end
   end

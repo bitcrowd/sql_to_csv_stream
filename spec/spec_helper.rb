@@ -2,6 +2,7 @@
 
 require 'bundler/setup'
 require 'sql_to_csv_stream'
+require 'fivemat'
 
 ENV['RAILS_ENV'] ||= 'test'
 RSpec.configure do |config|
@@ -10,6 +11,9 @@ RSpec.configure do |config|
 
   # Disable RSpec exposing methods globally on `Module` and `main`
   config.disable_monkey_patching!
+
+  config.default_formatter = 'Fivemat'
+  config.default_formatter = 'doc' if config.files_to_run.one?
 
   config.order = :random
 

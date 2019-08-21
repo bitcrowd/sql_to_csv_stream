@@ -5,7 +5,7 @@ require 'csv'
 module SqlToCsvStream
   class CsvEnumerator
     PREFIXES_TO_ESCAPE = %w[= @ + - |].freeze
-    ESCAPE_CHAR = "'".freeze
+    ESCAPE_CHAR = "'"
 
     # Other possible options are
     #   force_quote: '*'

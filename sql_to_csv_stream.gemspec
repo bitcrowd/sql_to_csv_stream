@@ -37,7 +37,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
-  spec.add_development_dependency 'fuubar'
+  spec.add_development_dependency 'fivemat'
 
   # for the rails dummy app
   spec.add_development_dependency 'capybara'
@@ -47,4 +47,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rails', '~> 5.2.2'
   spec.add_development_dependency 'rubocop'
   spec.add_development_dependency 'rubocop-bitcrowd'
+  spec.add_development_dependency 'rubocop-rails'
 end

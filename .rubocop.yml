@@ -16,3 +16,12 @@ AllCops:
 
 Metrics/MethodLength:
   Max: 15
+
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/HashTransformValues:
+  Enabled: true

@@ -44,7 +44,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pg'
   spec.add_development_dependency 'pry-rails'
   spec.add_development_dependency 'puma', '~> 4.3'
-  spec.add_development_dependency 'rails', '~> 5.2.2'
+  spec.add_development_dependency 'rails', '~> 5.2.4'
   spec.add_development_dependency 'rubocop'
   spec.add_development_dependency 'rubocop-bitcrowd'
   spec.add_development_dependency 'rubocop-rails'

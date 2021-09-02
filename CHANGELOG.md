@@ -1,14 +1,8 @@
 # SqlToCsvStream Changelog
 
-## 0.3.0 / unreleased
+## 0.3.0 DEPRECATED
 
-### Features
-
--
-
-### Bug fixes
-
--
+This project was deprecated.
 
 ## 0.2.2 / 2020-06-25
 

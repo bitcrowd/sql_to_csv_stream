@@ -1,5 +1,13 @@
 # SqlToCsvStream
 
+## DEPRECATION WARNING 💀
+
+⚠️ **Warning This project is no longer maintained.** ⚠️
+
+Feel free to fork the gem for your own needs.
+
+## About
+
 This is your favorite gem to produce CSV or JSON directly from SQL queries.
 It queries a PostgreSQL with a [`COPY`](https://www.postgresql.org/docs/current/sql-copy.html) statement and streams the result as CSV/JSON directly into a ruby enumerator.
 

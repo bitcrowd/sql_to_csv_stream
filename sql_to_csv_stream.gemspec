@@ -48,4 +48,19 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop'
   spec.add_development_dependency 'rubocop-bitcrowd'
   spec.add_development_dependency 'rubocop-rails'
+
+  spec.post_install_message = <<~MSG
+     ▄▄▄▄▄▄  ▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄ ▄▄▄▄▄▄   ▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄ ▄▄▄▄▄▄ ▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄ ▄▄▄▄▄▄
+    █      ██       █       █   ▄  █ █       █       █      █       █       █      █
+    █  ▄    █    ▄▄▄█    ▄  █  █ █ █ █    ▄▄▄█       █  ▄   █▄     ▄█    ▄▄▄█  ▄    █
+    █ █ █   █   █▄▄▄█   █▄█ █   █▄▄█▄█   █▄▄▄█     ▄▄█ █▄█  █ █   █ █   █▄▄▄█ █ █   █
+    █ █▄█   █    ▄▄▄█    ▄▄▄█    ▄▄  █    ▄▄▄█    █  █      █ █   █ █    ▄▄▄█ █▄█   █
+    █       █   █▄▄▄█   █   █   █  █ █   █▄▄▄█    █▄▄█  ▄   █ █   █ █   █▄▄▄█       █
+    █▄▄▄▄▄▄██▄▄▄▄▄▄▄█▄▄▄█   █▄▄▄█  █▄█▄▄▄▄▄▄▄█▄▄▄▄▄▄▄█▄█ █▄▄█ █▄▄▄█ █▄▄▄▄▄▄▄█▄▄▄▄▄▄█
+
+    !!! WARNING !!!
+
+    Unfortunately sql_to_csv_stream is deprecated...
+
+  MSG
 end
